@@ -38,55 +38,39 @@
     textarea{resize:vertical;min-height:110px;line-height:1.55}
     input:focus,textarea:focus{border-color:#a99d8c}
     .search-btn,.mini-btn{border:0;border-radius:14px;background:var(--accent);color:#26475c;font-weight:800;padding:0 15px;cursor:pointer}
-    .search-results{display:none;background:#fff;border:1px solid var(--line);border-radius:16px;margin:0 0 10px;overflow-y:auto;overflow-x:hidden;max-height:38vh;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:0 1 auto}
+    .search-results{display:none;background:#fff;border:1px solid var(--line);border-radius:18px;margin:0 0 12px;overflow-y:auto;overflow-x:hidden;max-height:48vh;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:0 1 auto}
     .search-results.open{display:block}
-    .result{
-      display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border:0;background:white;
-      padding:12px;border-bottom:1px solid #eee8dd;cursor:pointer;color:inherit
-    }
+    .result{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;border:0;background:#fff;padding:15px 14px;border-bottom:1px solid #f0f1f2;cursor:pointer;color:inherit}
     .result:last-child{border-bottom:0}
-    .result img{width:46px;aspect-ratio:2/3;object-fit:cover;border-radius:6px;background:#eee}
-    .rtitle{font-weight:800;font-size:14px;line-height:1.35}
-    .rmeta{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px}
-    .result-note{padding:12px;font-size:13px;color:var(--muted)}
+    .result img{width:56px;aspect-ratio:2/3;object-fit:cover;border-radius:7px;background:#eee;flex:0 0 auto}
+    .rtitle{font-weight:850;font-size:15px;line-height:1.4}
+    .rmeta{font-size:12px;color:var(--muted);line-height:1.6;margin-top:5px}
+    .result-note{padding:26px 16px;font-size:13px;color:var(--muted);text-align:center;line-height:1.6}
     .stack-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;margin-top:8px}.stack-label{font-size:12px;font-weight:800;color:var(--muted);margin:0 2px 6px}.stack-viewport{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:18px;background:#fff}.stack-wrap{min-height:100%;display:flex;align-items:flex-end;justify-content:center;padding:18px 4px 10px}
     .stack{width:100%;display:flex;flex-direction:column-reverse;align-items:center;gap:10px}
     .book{
       border:0;position:relative;display:flex;align-items:center;justify-content:center;
-      padding:0 18px;
-      color:#fff;font-weight:800;letter-spacing:-.02em;cursor:pointer;overflow:visible;
-      box-shadow:
-        0 7px 12px rgba(55,42,24,.14),
-        0 1px 2px rgba(55,42,24,.12);
-      isolation:isolate;
-      background-size:cover;
-      background-position:center center;
+      padding:0 16px 0 24px;
+      color:#fff;font-weight:800;letter-spacing:-.02em;cursor:pointer;overflow:hidden;
+      box-shadow:0 5px 9px rgba(55,42,24,.13),0 1px 2px rgba(55,42,24,.10);
+      isolation:isolate;background-size:cover;background-position:center center;
     }
     .book::before{
-      content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;
-      background:
-        linear-gradient(90deg,
-          rgba(20,16,12,.42) 0%,
-          rgba(255,255,255,.12) 7%,
-          rgba(0,0,0,.02) 16%,
-          rgba(0,0,0,.02) 82%,
-          rgba(0,0,0,.26) 100%);
+      content:"";position:absolute;inset:0;border-radius:inherit;z-index:0;
+      background:linear-gradient(90deg,rgba(18,16,14,.20),rgba(255,255,255,.05) 18%,rgba(0,0,0,.08) 100%);
       pointer-events:none;
     }
     .book::after{
-      content:"";position:absolute;left:8px;right:8px;bottom:-5px;height:7px;border-radius:0 0 6px 6px;
-      background:repeating-linear-gradient(to bottom,#fffdf7 0px,#fffdf7 1px,#e7e1d6 2px,#fffdf7 3px);
-      box-shadow:0 2px 3px rgba(70,55,35,.14);
-      pointer-events:none;z-index:-1;
+      content:"";position:absolute;left:6px;top:4px;bottom:4px;width:9px;border-radius:4px 2px 2px 4px;
+      background:repeating-linear-gradient(to bottom,#fffdf7 0,#fffdf7 1px,#e9e2d5 2px,#fffdf7 3px);
+      box-shadow:inset -2px 0 2px rgba(80,65,44,.12),1px 0 1px rgba(255,255,255,.65);
+      pointer-events:none;z-index:2;
     }
-    .book-top-edge{display:none}
     .book-title{
-      z-index:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:86%;
-      font-size:14px;text-shadow:0 1px 3px rgba(0,0,0,.55);
-      background:rgba(20,20,20,.24);
-      backdrop-filter:blur(2px);
-      -webkit-backdrop-filter:blur(2px);
-      padding:4px 10px;border-radius:999px;
+      z-index:3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:86%;
+      font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.55);
+      background:rgba(20,20,20,.22);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+      padding:3px 9px;border-radius:999px;
     }
     .empty{margin:auto;text-align:center;color:var(--muted);padding:70px 20px}
     .empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:8px}
@@ -249,7 +233,7 @@
   <header>
     <div>
       <h1>책책책 <span class="title-emoji">📖</span></h1>
-      <div class="sub">오늘도 한 권, 차곡차곡. · v2.3</div>
+      <div class="sub">오늘도 한 권, 차곡차곡. · v2.4</div>
     </div>
     <div class="header-actions">
       <div class="count-wrap">
@@ -430,7 +414,11 @@
   }
   function size(book){
     const p=Number(book.pages)||250;
-    return {height:clamp(50+(p/1000)*18,50,70),width:clamp(64+(hash(book.title)%18),64,82)}
+    {
+    const pp=Math.max(1,Number(p)||300);
+    const height=pp<=150?29:pp<=300?34:pp<=500?39:pp<=800?45:49;
+    return {height,width:clamp(60+(hash(book.title)%19),60,78)};
+  }
   }
   function monthKey(dateStr){
     if(!dateStr) return "";
@@ -486,8 +474,15 @@
   }
   function positionLatestBook(){
     const vp=$("stackViewport");
-    if(!vp) return;
-    requestAnimationFrame(()=>{ vp.scrollTop=Math.max(0,vp.scrollHeight-vp.clientHeight); });
+    const latest=$("stack")?.lastElementChild;
+    if(!vp || !latest) return;
+    requestAnimationFrame(()=>{
+      const vpRect=vp.getBoundingClientRect();
+      const bRect=latest.getBoundingClientRect();
+      const currentTop=bRect.top-vpRect.top+vp.scrollTop;
+      const targetTop=vp.clientHeight*0.30;
+      vp.scrollTop=Math.max(0,currentTop-targetTop);
+    });
   }
   function normalizeText(v){
     return String(v||"").toLowerCase().replace(/\s+/g,"").replace(/[^\p{L}\p{N}]/gu,"");
@@ -663,7 +658,7 @@
     const q=$("bookSearch").value.trim(); if(!q)return;
     const box=$("searchResults");
     box.classList.add("open");
-    box.innerHTML='<div class="result-note">알라딘에서 검색 중...</div>';
+    box.innerHTML='<div class="result-note">📖 알라딘에서 책을 찾고 있어요…</div>';
 
     try{
       const workerUrl="https://old-brook-92fd.leegh1310.workers.dev/search?q="+encodeURIComponent(q);
@@ -790,7 +785,7 @@
   $("exportBtn").addEventListener("click",()=>{
     const payload={
       app:"책책책",
-      version:"2.3",
+      version:"2.4",
       exportedAt:new Date().toISOString(),
       books:loadBooks()
     };
@@ -837,7 +832,7 @@
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
-    navigator.serviceWorker.register("./sw.js?v=2.3").then(function(r){r.update();}).catch(function(){});
+    navigator.serviceWorker.register("./sw.js?v=2.4").then(function(r){r.update();}).catch(function(){});
   });
 }
 </script>
