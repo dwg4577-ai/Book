@@ -50,11 +50,11 @@
     .rmeta{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px}
     .result-note{padding:12px;font-size:13px;color:var(--muted)}
     .stack-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;margin-top:8px}.stack-label{font-size:12px;font-weight:800;color:var(--muted);margin:0 2px 6px}.stack-viewport{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:18px;background:#fff}.stack-wrap{min-height:100%;display:flex;align-items:flex-end;justify-content:center;padding:18px 4px 10px}
-    .stack{width:100%;display:flex;flex-direction:column;align-items:center;gap:8px}
+    .stack{width:100%;display:flex;flex-direction:column-reverse;align-items:center;gap:10px}
     .book{
       border:0;position:relative;display:flex;align-items:center;justify-content:center;
       padding:0 18px;
-      color:#fff;font-weight:800;letter-spacing:-.02em;cursor:pointer;overflow:hidden;
+      color:#fff;font-weight:800;letter-spacing:-.02em;cursor:pointer;overflow:visible;
       box-shadow:
         0 7px 12px rgba(55,42,24,.14),
         0 1px 2px rgba(55,42,24,.12);
@@ -74,9 +74,10 @@
       pointer-events:none;
     }
     .book::after{
-      content:"";position:absolute;inset:0;border-radius:inherit;
-      background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.10));
-      pointer-events:none;
+      content:"";position:absolute;left:8px;right:8px;bottom:-5px;height:7px;border-radius:0 0 6px 6px;
+      background:repeating-linear-gradient(to bottom,#fffdf7 0px,#fffdf7 1px,#e7e1d6 2px,#fffdf7 3px);
+      box-shadow:0 2px 3px rgba(70,55,35,.14);
+      pointer-events:none;z-index:-1;
     }
     .book-top-edge{display:none}
     .book-title{
@@ -224,6 +225,23 @@
 
     .month-col{border:0;background:transparent;padding:0;cursor:pointer}
 
+  
+    .reread-card{position:relative;width:100%;max-width:520px;align-self:center;background:#fff;border:1px solid #eceff1;border-radius:22px;padding:20px 16px 16px;box-shadow:0 18px 50px rgba(30,55,70,.14)}
+    .reread-title{font-size:17px;font-weight:850;padding-right:36px}
+    .reread-sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .reread-prev{margin-top:14px;max-height:220px;overflow-y:auto}
+    .reread-prev-item{padding:10px 0;border-bottom:1px solid #f0f1f2}
+    .reread-prev-item:last-child{border-bottom:0}
+    .reread-prev-head{font-size:12px;font-weight:800}
+    .reread-prev-review{font-size:12px;color:#626b70;line-height:1.5;margin-top:4px;white-space:pre-wrap}
+    .reread-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+    .reread-history{background:#f7fbfd;border:1px solid #e5f1f7;border-radius:12px;padding:10px 12px;margin-bottom:14px}
+    .reread-history-title{font-size:12px;font-weight:850;color:#53758a;margin-bottom:6px}
+    .reread-history-item{font-size:11px;color:#65737b;line-height:1.5;padding:5px 0;border-top:1px solid #edf4f7}
+    .library-tabs{display:flex;gap:6px;margin-top:12px}
+    .lib-tab{border:0;border-radius:999px;padding:7px 11px;background:#f3f5f6;color:#657078;font-size:11px;font-weight:800;cursor:pointer}
+    .lib-tab.active{background:var(--accent-soft);color:#50778d}
+
   </style>
 </head>
 <body>
@@ -231,7 +249,7 @@
   <header>
     <div>
       <h1>책책책 <span class="title-emoji">📖</span></h1>
-      <div class="sub">오늘도 한 권, 차곡차곡. · v2.2</div>
+      <div class="sub">오늘도 한 권, 차곡차곡. · v2.3</div>
     </div>
     <div class="header-actions">
       <div class="count-wrap">
@@ -301,7 +319,8 @@
         </div>
       </div>
     </div>
-    <div class="field"><label for="review">간단 독후감</label><textarea id="review" placeholder="한 줄이어도 좋아요."></textarea></div>
+    <div class="reread-history" id="rereadHistory" hidden></div>
+    <div class="field"><label for="review">간단 독후감</label><textarea id="review" placeholder="이번에 읽고 남은 생각을 적어보세요."></textarea></div>
     <div class="actions">
       <button class="btn secondary" id="cancelBtn">취소</button>
       <button class="btn primary" id="saveBtn">저장</button>
@@ -321,6 +340,19 @@
 </div>
 
 
+<div class="detail-bg" id="rereadBg">
+  <section class="reread-card" role="dialog" aria-modal="true" aria-label="다시 읽기">
+    <button class="detail-close" id="closeReread" type="button" aria-label="닫기">×</button>
+    <div class="reread-title">전에 읽은 책이에요 📖</div>
+    <div class="reread-sub" id="rereadSub"></div>
+    <div class="reread-prev" id="rereadPrev"></div>
+    <div class="reread-actions">
+      <button class="detail-btn" id="viewPrevious" type="button">이전 기록 보기</button>
+      <button class="detail-btn edit" id="startReread" type="button">다시 읽기</button>
+    </div>
+  </section>
+</div>
+
 <div class="detail-bg" id="libraryBg">
   <section class="library-card" role="dialog" aria-modal="true" aria-label="읽은 책">
     <div class="library-head">
@@ -329,6 +361,10 @@
         <div class="library-sub" id="librarySub"></div>
       </div>
       <button class="detail-close static" id="closeLibrary" type="button" aria-label="닫기">×</button>
+    </div>
+    <div class="library-tabs" id="libraryTabs">
+      <button class="lib-tab active" data-mode="all" type="button">전체</button>
+      <button class="lib-tab" data-mode="reread" type="button">다독한 책 🔁</button>
     </div>
     <div class="library-search">
       <input id="historySearch" placeholder="제목이나 저자로 검색" autocomplete="off">
@@ -364,6 +400,7 @@
 <script>
 (function(){
   const STORAGE_KEY="myBookStack.v2";
+  const PASTELS=["#F6C6D0","#F8D8B6","#F7E8A4","#CDECCF","#CBE6F6","#D9D0F2","#E7C9E8","#D6E6D5"];
   const COLORS=["#8b6953","#586f72","#7a687f","#9b6b62","#747b57","#4f687b","#8d7756","#765d5d","#62735f","#665c78"];
   const $=id=>document.getElementById(id);
   let activeDetailId=null;
@@ -393,7 +430,7 @@
   }
   function size(book){
     const p=Number(book.pages)||250;
-    return {height:clamp(52+(p/1000)*20,52,72),width:clamp(78+(hash(book.title)%14),78,92)}
+    return {height:clamp(50+(p/1000)*18,50,70),width:clamp(64+(hash(book.title)%18),64,82)}
   }
   function monthKey(dateStr){
     if(!dateStr) return "";
@@ -433,7 +470,7 @@
       for(let i=0;i<c;i++){
         const b=document.createElement("div"); b.className="mini-book";
         b.style.width=(38+(i%4)*4)+"px";
-        b.style.background=COLORS[i%COLORS.length];
+        b.style.background=PASTELS[i%PASTELS.length];
         mini.appendChild(b);
       }
       col.appendChild(mini);
@@ -451,6 +488,23 @@
     const vp=$("stackViewport");
     if(!vp) return;
     requestAnimationFrame(()=>{ vp.scrollTop=Math.max(0,vp.scrollHeight-vp.clientHeight); });
+  }
+  function normalizeText(v){
+    return String(v||"").toLowerCase().replace(/\s+/g,"").replace(/[^\p{L}\p{N}]/gu,"");
+  }
+  function canonicalKey(book){
+    if(book?.isbn13) return "isbn:"+String(book.isbn13).trim();
+    return "txt:"+normalizeText(book?.title)+"|"+normalizeText(book?.author);
+  }
+  function readingsFor(book){
+    const key=canonicalKey(book);
+    return loadBooks().filter(b=>canonicalKey(b)===key)
+      .sort((a,b)=>(a.date||"").localeCompare(b.date||"") || (a.createdAt||0)-(b.createdAt||0));
+  }
+  function readingNumber(book){
+    const arr=readingsFor(book);
+    const i=arr.findIndex(b=>b.id===book.id);
+    return i>=0 ? i+1 : 1;
   }
   function render(){
     const books=loadBooks(); $("count").textContent="총 "+books.length+"권"; renderMonthly(books); $("stack").innerHTML="";
@@ -479,6 +533,7 @@
   }
 
   let libraryFilterMonth=null;
+  let libraryMode="all";
 
   function monthLabel(k){
     if(!k) return "";
@@ -490,6 +545,15 @@
     const all=loadBooks();
     const q=$("historySearch").value.trim().toLowerCase();
     let books=libraryFilterMonth ? all.filter(b=>monthKey(b.date)===libraryFilterMonth) : all.slice();
+    if(libraryMode==="reread"){
+      const counts={}; all.forEach(b=>{const k=canonicalKey(b);counts[k]=(counts[k]||0)+1});
+      const seen=new Set();
+      books=books.filter(b=>{
+        const k=canonicalKey(b);
+        if(counts[k]<2 || seen.has(k)) return false;
+        seen.add(k); return true;
+      });
+    }
     books=books.sort((a,b)=>(b.date||"").localeCompare(a.date||"") || (b.createdAt||0)-(a.createdAt||0));
     if(q){
       books=books.filter(b=>
@@ -506,7 +570,7 @@
       const row=document.createElement("button"); row.type="button"; row.className="history-item";
       row.innerHTML=`${book.cover?`<img class="history-cover" src="${esc(book.cover)}" alt="">`:'<div class="history-cover"></div>'}
         <div><div class="history-title">${esc(book.title)}</div>
-        <div class="history-meta">${book.author?esc(book.author):""}${book.date?" · "+esc(book.date):""}</div></div>`;
+        <div class="history-meta">${book.author?esc(book.author):""}${book.date?" · "+esc(book.date):""}${readingsFor(book).length>1?" · "+readingsFor(book).length+"회 읽음":""}</div></div>`;
       row.addEventListener("click",()=>{ closeLibrary(); openDetail(book.id); });
       list.appendChild(row);
     });
@@ -514,6 +578,8 @@
 
   function openLibrary(month=null){
     libraryFilterMonth=month;
+    libraryMode="all";
+    document.querySelectorAll(".lib-tab").forEach(t=>t.classList.toggle("active",t.dataset.mode==="all"));
     const all=loadBooks();
     const scoped=month ? all.filter(b=>monthKey(b.date)===month) : all;
     $("libraryTitle").textContent=month ? `${monthLabel(month)}에 읽은 책` : "읽은 책 찾기";
@@ -528,6 +594,25 @@
     libraryFilterMonth=null;
   }
 
+  let pendingRereadDraft=null;
+  let pendingPrevious=[];
+
+  function handleBookSelection(draft){
+    const prev=loadBooks().filter(b=>canonicalKey(b)===canonicalKey(draft));
+    if(!prev.length){ openEditor(draft); return; }
+    pendingRereadDraft=draft;
+    pendingPrevious=prev.sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    $("rereadSub").textContent=`${draft.title} · 지금까지 ${prev.length}회 읽었어요.`;
+    $("rereadPrev").innerHTML=pendingPrevious.map((r,i)=>`
+      <div class="reread-prev-item">
+        <div class="reread-prev-head">${i+1}회차 · ${esc(r.date||"날짜 없음")} ${r.rating?"· ★ "+esc(r.rating):""}</div>
+        <div class="reread-prev-review">${esc(r.review||"독후감 없음")}</div>
+      </div>`).join("");
+    $("rereadBg").classList.add("open");
+  }
+
+  function closeReread(){ $("rereadBg").classList.remove("open"); }
+
   function openEditor(book){
     document.body.style.overflow="hidden"; $("editorBg").classList.add("open");
     $("editorTitle").textContent=book?"책 기록 수정":"책 추가";
@@ -535,6 +620,15 @@
     $("pages").value=book?.pages||""; $("cover").value=book?.cover||"";
     $("date").value=book?.date||new Date().toISOString().slice(0,10);
     setRating(book?.rating??""); $("review").value=book?.review||"";
+    const historyBox=$("rereadHistory");
+    const prev=(book&&book._previousReadings)||[];
+    if(prev.length){
+      historyBox.hidden=false;
+      historyBox.innerHTML='<div class="reread-history-title">이전에 남긴 기록</div>'+
+        prev.map((r,i)=>`<div class="reread-history-item"><b>${i+1}회차 · ${esc(r.date||"날짜 없음")} · ${r.rating?esc(r.rating)+"점":"별점 없음"}</b><br>${esc(r.review||"독후감 없음")}</div>`).join("");
+    }else{
+      historyBox.hidden=true; historyBox.innerHTML="";
+    }
   }
   function closeEditor(){$("editorBg").classList.remove("open");document.body.style.overflow=""}
   function saveEditor(){
@@ -557,8 +651,8 @@
     $("detailContent").innerHTML=`
       <div class="detail-head">
         ${book.cover?`<img class="cover" src="${esc(book.cover)}" alt="">`:'<div class="cover"></div>'}
-        <div class="detail-meta"><div class="detail-title">${esc(book.title)}</div>
-        <div class="meta">${book.author?esc(book.author)+"<br>":""}${book.pages?book.pages.toLocaleString()+"쪽<br>":""}${book.date?esc(book.date)+"<br>":""}
+        <div class="detail-meta"><div class="detail-title">${esc(book.title)}${readingsFor(book).length>1?` <span style="font-size:11px;color:#7d8b93;font-weight:700">· ${readingsFor(book).length}회 읽음</span>`:""}</div>
+        <div class="meta">${book.author?esc(book.author)+"<br>":""}${book.pages?book.pages.toLocaleString()+"쪽<br>":""}${book.date?`${readingsFor(book).length>1?readingNumber(book)+"회차 · ":""}${esc(book.date)}<br>`:""}
         <span class="stars">${book.rating?renderRatingText(book.rating):"별점 없음"}</span></div></div>
       </div>
       <label>독후감</label><div class="review-box">${esc(book.review||"아직 작성한 독후감이 없어요.")}</div>`;
@@ -607,7 +701,7 @@
               }
             }catch(e){}
           }
-          openEditor({
+          const draft={
             title:detail.title||item.title||"",
             author:detail.author||item.author||"",
             pages:pages||0,
@@ -617,7 +711,8 @@
             review:"",
             isbn13:detail.isbn13||item.isbn13||"",
             aladinLink:detail.link||item.link||""
-          });
+          };
+          handleBookSelection(draft);
         });
         box.appendChild(btn);
       });
@@ -657,6 +752,25 @@
   $("closeLibrary").addEventListener("click",closeLibrary);
   $("libraryBg").addEventListener("click",e=>{if(e.target===$("libraryBg"))closeLibrary()});
   $("historySearch").addEventListener("input",renderLibraryList);
+  $("closeReread").addEventListener("click",()=>{closeReread();pendingRereadDraft=null;pendingPrevious=[]});
+  $("rereadBg").addEventListener("click",e=>{if(e.target===$("rereadBg"))closeReread()});
+  $("startReread").addEventListener("click",()=>{
+    if(!pendingRereadDraft)return;
+    const draft={...pendingRereadDraft,_previousReadings:pendingPrevious};
+    closeReread(); openEditor(draft);
+  });
+  $("viewPrevious").addEventListener("click",()=>{
+    if(!pendingPrevious.length)return;
+    const id=pendingPrevious[pendingPrevious.length-1].id;
+    closeReread(); openDetail(id);
+  });
+  document.querySelectorAll(".lib-tab").forEach(tab=>{
+    tab.addEventListener("click",()=>{
+      libraryMode=tab.dataset.mode||"all";
+      document.querySelectorAll(".lib-tab").forEach(t=>t.classList.toggle("active",t===tab));
+      renderLibraryList();
+    });
+  });
   $("searchBtn").addEventListener("click",searchBooks);
   $("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")searchBooks()});
 
@@ -676,7 +790,7 @@
   $("exportBtn").addEventListener("click",()=>{
     const payload={
       app:"책책책",
-      version:"2.2",
+      version:"2.3",
       exportedAt:new Date().toISOString(),
       books:loadBooks()
     };
@@ -723,7 +837,7 @@
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
-    navigator.serviceWorker.register("./sw.js?v=2.1").then(function(r){r.update();}).catch(function(){});
+    navigator.serviceWorker.register("./sw.js?v=2.3").then(function(r){r.update();}).catch(function(){});
   });
 }
 </script>
