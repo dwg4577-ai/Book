@@ -9,37 +9,38 @@
   <meta name="apple-mobile-web-app-title" content="나의 책더미" />
   <link rel="manifest" href="./manifest.json" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
-  <title>나의 책더미</title>
+  <title>책책책 📖</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#f6f1e7;
-      --ink:#28251f;
-      --muted:#7b7468;
-      --card:#fffdf8;
-      --line:#ded6c8;
-      --shadow:0 10px 30px rgba(72,58,38,.12);
+      --bg:#ffffff;
+      --ink:#252525;
+      --muted:#8a8a8a;
+      --card:#ffffff;
+      --line:#e8e8e8;
+      --accent:#a9d8f4;
+      --accent-deep:#70b8e4;
+      --accent-soft:#eef8fe;
+      --shadow:0 10px 30px rgba(40,70,90,.08);
     }
-    *{box-sizing:border-box}
-    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+    *{box-sizing:border-box;min-width:0}
+    html,body{margin:0;width:100%;max-width:100%;overflow-x:hidden;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
     body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
     button,input,textarea{font:inherit}
     button{-webkit-tap-highlight-color:transparent}
-    .app{width:min(680px,100%);margin:0 auto;min-height:100vh;padding:20px 18px 120px}
+    .app{width:100%;max-width:680px;margin:0 auto;min-height:100vh;padding:20px 16px 120px;overflow-x:hidden}
     header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
-    h1{font-size:27px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.03em}
-    .sub{margin-top:7px;font-size:13px;color:var(--muted)}
+    h1{font-family:"Gaegu","Segoe Print",cursive;font-size:38px;line-height:1;margin:0;font-weight:700;letter-spacing:-.04em}.title-emoji{font-family:Apple Color Emoji,"Segoe UI Emoji",sans-serif;font-size:.72em}
+    .sub{margin-top:7px;font-family:"Gaegu","Segoe Print",cursive;font-size:18px;color:var(--muted)}
     .count{font-size:13px;color:var(--muted);white-space:nowrap}
     .search-row{display:flex;gap:8px;margin-bottom:16px}
     .search-row input{flex:1}
-    input,textarea{
-      width:100%;border:1px solid var(--line);background:white;border-radius:13px;
-      padding:12px 13px;color:var(--ink);outline:none;font-size:16px;
-    }
+    input,textarea{display:block;width:100%;max-width:100%;min-width:0;border:1px solid var(--line);background:white;border-radius:13px;padding:12px 13px;color:var(--ink);outline:none;font-size:16px;-webkit-appearance:none;appearance:none}
     textarea{resize:vertical;min-height:110px;line-height:1.55}
     input:focus,textarea:focus{border-color:#a99d8c}
-    .search-btn,.mini-btn{
-      border:0;border-radius:13px;background:#292620;color:white;font-weight:800;padding:0 14px;cursor:pointer
-    }
+    .search-btn,.mini-btn{border:0;border-radius:14px;background:var(--accent);color:#26475c;font-weight:800;padding:0 15px;cursor:pointer}
     .search-results{display:none;background:#fffdf8;border:1px solid var(--line);border-radius:16px;margin:-4px 0 18px;overflow:hidden}
     .search-results.open{display:block}
     .result{
@@ -112,11 +113,7 @@
     }
     .empty{margin:auto;text-align:center;color:var(--muted);padding:70px 20px}
     .empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:8px}
-    .fab{
-      position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom));
-      border:0;border-radius:999px;padding:15px 22px;background:#292620;color:white;font-weight:800;
-      box-shadow:0 10px 24px rgba(0,0,0,.22);cursor:pointer;z-index:20
-    }
+    .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom));border:0;border-radius:999px;padding:15px 24px;background:var(--accent);color:#23465b;font-weight:850;box-shadow:0 10px 24px rgba(82,157,198,.20);cursor:pointer;z-index:20;white-space:nowrap}
     .sheet-bg{position:fixed;inset:0;background:rgba(22,18,13,.28);display:none;align-items:flex-end;justify-content:center;z-index:30}
     .sheet-bg.open{display:flex}
     .sheet{
@@ -127,11 +124,11 @@
     .sheet h2{font-size:20px;margin:0 0 18px}
     .field{margin-bottom:14px}
     label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px}
-    .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.grid>*{min-width:0}
+    .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;width:100%}.grid>*{min-width:0;max-width:100%}
     .actions{display:flex;gap:10px;margin-top:18px}
     .btn{flex:1;border:0;border-radius:13px;padding:13px 12px;font-weight:800;cursor:pointer}
-    .btn.primary{background:#292620;color:#fff}
-    .btn.secondary{background:#eee8dd;color:#4f493f}
+    .btn.primary{background:var(--accent);color:#23465b}
+    .btn.secondary{background:#f4f4f4;color:#555}
     .btn.danger{background:#f5e4e0;color:#9a3d2d}
     .hint{font-size:12px;color:var(--muted);margin:-4px 0 12px;line-height:1.45}
     .detail-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:18px}
@@ -139,21 +136,21 @@
     .detail-meta{flex:1}
     .detail-title{font-size:21px;font-weight:850;line-height:1.35;margin-bottom:7px}
     .meta{font-size:13px;color:var(--muted);line-height:1.6}
-    .review-box{white-space:pre-wrap;line-height:1.7;background:#f8f4ec;border-radius:14px;padding:14px;margin-top:10px}
+    .review-box{white-space:pre-wrap;line-height:1.7;background:#fafafa;border:1px solid #f0f0f0;border-radius:14px;padding:14px;margin-top:10px}
     .stars{letter-spacing:2px;color:#aa7d20}
     .rating-picker{display:flex;align-items:center;gap:6px;min-height:48px;padding:7px 9px;border:1px solid var(--line);background:white;border-radius:13px}
     .star-wrap{position:relative;width:30px;height:30px;flex:0 0 30px}
     .star-wrap button{position:absolute;top:0;bottom:0;width:50%;border:0;padding:0;margin:0;background:transparent;cursor:pointer;z-index:2}
     .star-wrap .half-left{left:0}.star-wrap .half-right{right:0}
     .star-bg,.star-fill{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1;pointer-events:none}
-    .star-bg{color:#d9d2c6}
-    .star-fill{color:#aa7d20;overflow:hidden;width:0}
+    .star-bg{color:#dddddd}
+    .star-fill{color:#f4b942;width:100%;clip-path:inset(0 100% 0 0);-webkit-clip-path:inset(0 100% 0 0)}
     .rating-value{font-size:12px;color:var(--muted);white-space:nowrap;margin-left:2px}
     @media(max-width:520px){.grid{grid-template-columns:1fr}.field{min-width:0}}
     
     
-    .gear-btn{border:0;background:#ebe4d8;color:#4e473d;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer}
-    .section-card{background:#f8f4ec;border-radius:16px;padding:14px;margin-bottom:14px}
+    .gear-btn{border:0;background:var(--accent-soft);color:#4d7891;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer}
+    .section-card{background:#fafafa;border:1px solid #f0f0f0;border-radius:16px;padding:14px;margin-bottom:14px}
     .section-title{font-weight:850;font-size:15px;margin-bottom:8px}
     .section-text{font-size:12px;color:var(--muted);line-height:1.6}
     .settings-row{display:flex;gap:8px;align-items:center}
@@ -167,20 +164,36 @@
       .stack-wrap{min-height:480px}
       .book-title{font-size:13px}
     }
+  
+    @media(max-width:520px){
+      header{align-items:flex-start}
+      .app{padding-left:14px;padding-right:14px}
+      .search-row{width:100%;grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr}
+      .field{width:100%;max-width:100%}
+      input[type="date"]{width:100%;max-width:100%;min-width:0}
+      .rating-picker{width:100%;max-width:100%;gap:4px;overflow:hidden}
+      .star-wrap{width:28px;height:28px;flex:0 0 28px}
+      .star-bg,.star-fill{font-size:26px}
+      .rating-value{font-size:11px}
+      .sheet{width:100%;max-width:100%;padding-left:14px;padding-right:14px}
+      .search-results{width:100%;max-width:100%}
+    }
+
   </style>
 </head>
 <body>
 <main class="app">
   <header>
     <div>
-      <h1>나의 책더미</h1>
-      <div class="sub">읽은 만큼 한 권씩 쌓여요. · v1.5</div>
+      <h1>책책책 <span class="title-emoji">📖</span></h1>
+      <div class="sub">오늘도 한 권, 차곡차곡. · v1.6</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px"><div class="count" id="count">0권</div><button class="gear-btn" id="settingsBtn" aria-label="설정">⚙︎</button></div>
   </header>
 
   <div class="search-row">
-    <input id="bookSearch" placeholder="책 제목 검색" autocomplete="off" />
+    <input id="bookSearch" placeholder="어떤 책을 읽었나요?" autocomplete="off" />
     <button class="search-btn" id="searchBtn">검색</button>
   </div>
   <div class="search-results" id="searchResults"></div>
@@ -190,7 +203,7 @@
   </section>
 </main>
 
-<button class="fab" id="addBtn">＋ 직접 추가</button>
+<button class="fab" id="addBtn">＋ 책 쌓기</button>
 
 <div class="sheet-bg" id="editorBg">
   <section class="sheet" role="dialog" aria-modal="true">
@@ -202,7 +215,7 @@
       <div class="field"><label for="author">저자</label><input id="author"></div>
       <div class="field"><label for="pages">쪽수</label><input id="pages" type="number" min="1" inputmode="numeric"></div>
     </div>
-    <div class="field"><label for="cover">표지 이미지 주소</label><input id="cover" type="url"></div>
+    <input id="cover" type="hidden">
     <div class="grid">
       <div class="field">
         <label for="date">읽은 날짜</label>
@@ -285,9 +298,16 @@
     fills.forEach((fill,i)=>{
       const starStart=i;
       const amount=Math.max(0,Math.min(1,v-starStart));
-      fill.style.width=(amount*100)+"%";
+      const right=(1-amount)*100; fill.style.clipPath=`inset(0 ${right}% 0 0)`; fill.style.webkitClipPath=`inset(0 ${right}% 0 0)`;
     });
     $("ratingValue").textContent=v ? v.toFixed(1)+"점" : "선택 안 함";
+  }
+  function renderRatingText(value){
+    const v=Math.max(0,Math.min(5,Number(value)||0));
+    if(!v) return "별점 없음";
+    const full=Math.floor(v);
+    const half=(v-full)>=0.5;
+    return "★".repeat(full)+(half?"◐":"")+"☆".repeat(5-full-(half?1:0))+"  "+v.toFixed(1);
   }
   function size(book){
     const p=Number(book.pages)||250;
@@ -345,7 +365,7 @@
         ${book.cover?`<img class="cover" src="${esc(book.cover)}" alt="">`:'<div class="cover"></div>'}
         <div class="detail-meta"><div class="detail-title">${esc(book.title)}</div>
         <div class="meta">${book.author?esc(book.author)+"<br>":""}${book.pages?book.pages.toLocaleString()+"쪽<br>":""}${book.date?esc(book.date)+"<br>":""}
-        <span class="stars">${book.rating?"★ "+esc(book.rating)+" / 5":"별점 없음"}</span></div></div>
+        <span class="stars">${book.rating?renderRatingText(book.rating):"별점 없음"}</span></div></div>
       </div>
       <label>독후감</label><div class="review-box">${esc(book.review||"아직 작성한 독후감이 없어요.")}</div>`;
   }
@@ -380,18 +400,29 @@
         btn.innerHTML=`${img?`<img src="${esc(img)}" alt="">`:'<div style="width:46px;aspect-ratio:2/3;background:#eee;border-radius:6px"></div>'}
           <div><div class="rtitle">${esc(item.title||"제목 없음")}</div>
           <div class="rmeta">${esc(item.author||"")}${pageCount?" · "+pageCount+"쪽":""}${item.publisher?"<br>"+esc(item.publisher):""}</div></div>`;
-        btn.addEventListener("click",()=>{
+        btn.addEventListener("click",async()=>{
           box.classList.remove("open");
+          let pages=pageCount||0;
+          let detail=item;
+          if(item.isbn13){
+            try{
+              const detailRes=await fetch("https://old-brook-92fd.leegh1310.workers.dev/detail?isbn="+encodeURIComponent(item.isbn13));
+              if(detailRes.ok){
+                const d=await detailRes.json();
+                if(d.book){ detail=d.book; pages=Number(d.book.pages||pages||0); }
+              }
+            }catch(e){}
+          }
           openEditor({
-            title:item.title||"",
-            author:item.author||"",
-            pages:pageCount||0,
-            cover:img,
+            title:detail.title||item.title||"",
+            author:detail.author||item.author||"",
+            pages:pages||0,
+            cover:(detail.cover||img||"").replace(/^http:/,"https:"),
             date:new Date().toISOString().slice(0,10),
             rating:"",
             review:"",
-            isbn13:item.isbn13||"",
-            aladinLink:item.link||""
+            isbn13:detail.isbn13||item.isbn13||"",
+            aladinLink:detail.link||item.link||""
           });
         });
         box.appendChild(btn);
@@ -437,7 +468,7 @@
   $("exportBtn").addEventListener("click",()=>{
     const payload={
       app:"나의 책더미",
-      version:"1.4",
+      version:"1.6",
       exportedAt:new Date().toISOString(),
       books:loadBooks()
     };

@@ -1,12 +1,12 @@
 {
-  "name": "나의 책더미",
-  "short_name": "책더미",
-  "description": "읽은 책을 책더미처럼 쌓아가는 간단한 독서 기록 웹앱",
+  "name": "책책책 📖",
+  "short_name": "책책책",
+  "description": "읽은 책을 차곡차곡 쌓는 독서 기록 웹앱",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f6f1e7",
-  "theme_color": "#f6f1e7",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "orientation": "portrait",
   "icons": [
     {
