@@ -23,11 +23,11 @@
       --shadow:0 10px 30px rgba(40,70,90,.08);
     }
     *{box-sizing:border-box;min-width:0}
-    html,body{margin:0;width:100%;max-width:100%;overflow-x:hidden;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
-    body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+    html,body{margin:0;width:100%;height:100%;max-width:100%;overflow:hidden;overscroll-behavior:none;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+    body{position:fixed;inset:0;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);touch-action:manipulation}
     button,input,textarea{font:inherit}
     button{-webkit-tap-highlight-color:transparent}
-    .app{width:100%;max-width:680px;height:100dvh;margin:0 auto;padding:16px 16px 92px;overflow:hidden;display:flex;flex-direction:column}
+    .app{width:100%;max-width:680px;height:100%;margin:0 auto;padding:14px 16px calc(88px + env(safe-area-inset-bottom));overflow:hidden;display:flex;flex-direction:column}
     header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px;flex:0 0 auto}
     h1{font-size:29px;line-height:1.15;margin:0;font-weight:850;letter-spacing:-.035em}.title-emoji{font-family:Apple Color Emoji,"Segoe UI Emoji",sans-serif;font-size:.72em}
     .sub{margin-top:7px;font-size:13px;color:var(--muted)}
@@ -38,7 +38,7 @@
     textarea{resize:vertical;min-height:110px;line-height:1.55}
     input:focus,textarea:focus{border-color:#a99d8c}
     .search-btn,.mini-btn{border:0;border-radius:14px;background:var(--accent);color:#26475c;font-weight:800;padding:0 15px;cursor:pointer}
-    .search-results{display:none;background:#fffdf8;border:1px solid var(--line);border-radius:16px;margin:-4px 0 18px;overflow:hidden}
+    .search-results{display:none;background:#fff;border:1px solid var(--line);border-radius:16px;margin:0 0 10px;overflow-y:auto;overflow-x:hidden;max-height:38vh;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;flex:0 1 auto}
     .search-results.open{display:block}
     .result{
       display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border:0;background:white;
@@ -49,8 +49,8 @@
     .rtitle{font-weight:800;font-size:14px;line-height:1.35}
     .rmeta{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px}
     .result-note{padding:12px;font-size:13px;color:var(--muted)}
-    .stack-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;margin-top:8px}.stack-label{font-size:12px;font-weight:800;color:var(--muted);margin:0 2px 6px}.stack-viewport{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:18px;background:#fff}.stack-wrap{min-height:100%;display:flex;align-items:flex-end;justify-content:center;padding:18px 4px 28vh}
-    .stack{width:100%;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;margin-top:auto}
+    .stack-shell{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;margin-top:8px}.stack-label{font-size:12px;font-weight:800;color:var(--muted);margin:0 2px 6px}.stack-viewport{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;border-radius:18px;background:#fff}.stack-wrap{min-height:100%;display:flex;align-items:flex-start;justify-content:center;padding:30% 4px 24px}
+    .stack{width:100%;display:flex;flex-direction:column-reverse;align-items:center;gap:8px}
     .book{
       border:0;position:relative;display:flex;align-items:center;justify-content:center;
       padding:0 24px 0 28px;
@@ -178,10 +178,10 @@
     }
 
   
-    .monthly-section{flex:0 0 auto;margin-top:2px}
-    .section-heading{display:flex;align-items:flex-end;justify-content:space-between;padding:0 2px 6px}
-    .section-title-main{font-size:14px;font-weight:850;color:#2f3a40}
-    .section-sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .monthly-panel{flex:0 0 auto;margin-top:2px}.month-toggle{width:100%;border:0;background:transparent;padding:4px 2px 6px;display:flex;align-items:center;justify-content:space-between;color:#53616a;font-size:12px;font-weight:800;cursor:pointer}.monthly-section{flex:0 0 auto;margin-top:0}
+    
+    
+    
     .month-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:2px 0 6px}
     .month-scroll::-webkit-scrollbar{display:none}
     .month-chart{display:flex;align-items:flex-end;gap:12px;min-width:max-content;padding:0 4px;height:116px}
@@ -198,7 +198,7 @@
   <header>
     <div>
       <h1>책책책 <span class="title-emoji">📖</span></h1>
-      <div class="sub">오늘도 한 권, 차곡차곡. · v1.9</div>
+      <div class="sub">오늘도 한 권, 차곡차곡. · v2.0</div>
     </div>
     <div class="header-actions">
       <div class="count-wrap">
@@ -215,15 +215,15 @@
   </div>
   <div class="search-results" id="searchResults"></div>
 
-  <section class="monthly-section">
-    <div class="section-heading">
-      <div>
-        <div class="section-title-main">월별 책더미</div>
-        <div class="section-sub" id="monthSummary">이번 달 0권 읽었어요.</div>
+  <section class="monthly-panel">
+    <button class="month-toggle" id="monthToggle" type="button" aria-expanded="false">
+      <span>월별 책더미</span>
+      <span id="monthToggleIcon">⌄</span>
+    </button>
+    <div class="monthly-section" id="monthlySection" hidden>
+      <div class="month-scroll" id="monthScroll">
+        <div class="month-chart" id="monthChart"></div>
       </div>
-    </div>
-    <div class="month-scroll" id="monthScroll">
-      <div class="month-chart" id="monthChart"></div>
     </div>
   </section>
 
@@ -247,7 +247,7 @@
     <div class="field"><label for="title">책 제목</label><input id="title"></div>
     <div class="grid">
       <div class="field"><label for="author">저자</label><input id="author"></div>
-      <div class="field"><label for="pages">쪽수</label><input id="pages" type="number" min="1" inputmode="numeric"></div>
+      <div class="field"><label for="pages">쪽수</label><input id="pages" type="number" min="1" inputmode="numeric" placeholder="자동 조회 · 없으면 직접 입력"></div>
     </div>
     <input id="cover" type="hidden">
     <div class="grid">
@@ -363,7 +363,6 @@
     });
     const currentCount=counts[currentKey]||0;
     $("monthCount").textContent=`이번 달 ${currentCount}권`;
-    $("monthSummary").textContent=`이번 달 ${currentCount}권 읽었어요.`;
 
     const keys=Object.keys(counts).sort();
     const first=keys[0]||currentKey;
@@ -390,18 +389,18 @@
         mini.appendChild(b);
       }
       col.appendChild(mini);
-      const name=document.createElement("div"); name.className="month-name"; name.textContent=`${Number(mm)}월`;
+      const years=new Set(months.map(x=>x.split("-")[0]));
+      const name=document.createElement("div"); name.className="month-name";
+      name.textContent=years.size>1 ? `${yy}. ${Number(mm)}월` : `${Number(mm)}월`;
       const num=document.createElement("div"); num.className="month-num"; num.textContent=`${c}권`;
       col.appendChild(name); col.appendChild(num); chart.appendChild(col);
     });
-    requestAnimationFrame(()=>{ $("monthScroll").scrollLeft=$("monthScroll").scrollWidth; });
+
   }
   function positionLatestBook(){
     const vp=$("stackViewport");
     if(!vp) return;
-    requestAnimationFrame(()=>{
-      vp.scrollTop=Math.max(0, vp.scrollHeight - vp.clientHeight + vp.clientHeight*0.30);
-    });
+    requestAnimationFrame(()=>{ vp.scrollTop=0; });
   }
   function render(){
     const books=loadBooks(); $("count").textContent="총 "+books.length+"권"; renderMonthly(books); $("stack").innerHTML="";
@@ -542,6 +541,16 @@
     btn.addEventListener("click",()=>setRating(btn.dataset.rating));
   });
   $("ratingPicker").addEventListener("dblclick",()=>setRating(0));
+  $("monthToggle").addEventListener("click",()=>{
+    const section=$("monthlySection");
+    const opening=section.hidden;
+    section.hidden=!opening;
+    $("monthToggle").setAttribute("aria-expanded", opening ? "true" : "false");
+    $("monthToggleIcon").textContent=opening ? "⌃" : "⌄";
+    if(opening){
+      requestAnimationFrame(()=>{ $("monthScroll").scrollLeft=$("monthScroll").scrollWidth; });
+    }
+  });
   $("searchBtn").addEventListener("click",searchBooks);
   $("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")searchBooks()});
 
@@ -561,7 +570,7 @@
   $("exportBtn").addEventListener("click",()=>{
     const payload={
       app:"나의 책더미",
-      version:"1.9",
+      version:"2.0",
       exportedAt:new Date().toISOString(),
       books:loadBooks()
     };

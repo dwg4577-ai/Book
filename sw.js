@@ -1,4 +1,4 @@
-const CACHE = "book-stack-v1-9";
+const CACHE = "book-stack-v2-0";
 const ASSETS = ["./","./index.html","./manifest.json","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install", event => {
