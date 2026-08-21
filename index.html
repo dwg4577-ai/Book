@@ -54,12 +54,62 @@
     .stack-wrap{min-height:510px;display:flex;align-items:flex-end;justify-content:center;padding:12px 4px 22px}
     .stack{width:100%;display:flex;flex-direction:column-reverse;align-items:center;gap:8px}
     .book{
-      border:0;position:relative;display:flex;align-items:center;justify-content:center;padding:0 18px;
-      box-shadow:0 5px 8px rgba(60,46,26,.12);color:#fff;font-weight:750;letter-spacing:-.02em;
-      cursor:pointer;overflow:hidden
+      border:0;position:relative;display:flex;align-items:center;justify-content:center;
+      padding:0 24px 0 28px;
+      color:#fff;font-weight:800;letter-spacing:-.02em;cursor:pointer;overflow:visible;
+      box-shadow:
+        0 8px 10px rgba(55,42,24,.18),
+        0 2px 2px rgba(55,42,24,.18);
+      isolation:isolate;
+      background-size:cover;
+      background-position:center 45%;
     }
-    .book::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.2),transparent 18%,transparent 78%,rgba(0,0,0,.08));pointer-events:none}
-    .book-title{z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:88%;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.16)}
+    .book::before{
+      content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;
+      background:
+        linear-gradient(90deg,
+          rgba(20,16,12,.42) 0%,
+          rgba(255,255,255,.12) 7%,
+          rgba(0,0,0,.02) 16%,
+          rgba(0,0,0,.02) 82%,
+          rgba(0,0,0,.26) 100%);
+      pointer-events:none;
+    }
+    .book::after{
+      content:"";position:absolute;left:7px;top:5px;bottom:5px;width:10px;border-radius:4px 2px 2px 4px;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,.92) 0px,
+          rgba(255,255,255,.92) 1px,
+          rgba(227,220,207,.9) 2px,
+          rgba(255,255,255,.92) 3px
+        );
+      box-shadow:inset -2px 0 3px rgba(80,65,44,.18);
+      opacity:.96;
+      pointer-events:none;
+    }
+    .book-cover-veil{
+      position:absolute;inset:0;border-radius:inherit;overflow:hidden;z-index:-2;background:inherit;
+    }
+    .book-cover-veil::after{
+      content:"";position:absolute;inset:0;
+      background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.10));
+    }
+    .book-top-edge{
+      position:absolute;left:14px;right:8px;top:-3px;height:5px;border-radius:70% 70% 30% 30%;
+      background:rgba(255,255,255,.72);
+      box-shadow:0 1px 2px rgba(70,55,35,.20);
+      opacity:.8;pointer-events:none;
+    }
+    .book-title{
+      z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:86%;
+      font-size:14px;text-shadow:0 1px 3px rgba(0,0,0,.48);
+      background:rgba(25,20,16,.22);
+      backdrop-filter:blur(2px);
+      -webkit-backdrop-filter:blur(2px);
+      padding:4px 9px;border-radius:999px;
+    }
     .empty{margin:auto;text-align:center;color:var(--muted);padding:70px 20px}
     .empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:8px}
     .fab{
@@ -77,7 +127,7 @@
     .sheet h2{font-size:20px;margin:0 0 18px}
     .field{margin-bottom:14px}
     label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}.grid>*{min-width:0}
     .actions{display:flex;gap:10px;margin-top:18px}
     .btn{flex:1;border:0;border-radius:13px;padding:13px 12px;font-weight:800;cursor:pointer}
     .btn.primary{background:#292620;color:#fff}
@@ -91,6 +141,16 @@
     .meta{font-size:13px;color:var(--muted);line-height:1.6}
     .review-box{white-space:pre-wrap;line-height:1.7;background:#f8f4ec;border-radius:14px;padding:14px;margin-top:10px}
     .stars{letter-spacing:2px;color:#aa7d20}
+    .rating-picker{display:flex;align-items:center;gap:6px;min-height:48px;padding:7px 9px;border:1px solid var(--line);background:white;border-radius:13px}
+    .star-wrap{position:relative;width:30px;height:30px;flex:0 0 30px}
+    .star-wrap button{position:absolute;top:0;bottom:0;width:50%;border:0;padding:0;margin:0;background:transparent;cursor:pointer;z-index:2}
+    .star-wrap .half-left{left:0}.star-wrap .half-right{right:0}
+    .star-bg,.star-fill{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;line-height:1;pointer-events:none}
+    .star-bg{color:#d9d2c6}
+    .star-fill{color:#aa7d20;overflow:hidden;width:0}
+    .rating-value{font-size:12px;color:var(--muted);white-space:nowrap;margin-left:2px}
+    @media(max-width:520px){.grid{grid-template-columns:1fr}.field{min-width:0}}
+    
     
     .gear-btn{border:0;background:#ebe4d8;color:#4e473d;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer}
     .section-card{background:#f8f4ec;border-radius:16px;padding:14px;margin-bottom:14px}
@@ -114,7 +174,7 @@
   <header>
     <div>
       <h1>나의 책더미</h1>
-      <div class="sub">읽은 만큼 한 권씩 쌓여요. · v1.3</div>
+      <div class="sub">읽은 만큼 한 권씩 쌓여요. · v1.5</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px"><div class="count" id="count">0권</div><button class="gear-btn" id="settingsBtn" aria-label="설정">⚙︎</button></div>
   </header>
@@ -144,8 +204,22 @@
     </div>
     <div class="field"><label for="cover">표지 이미지 주소</label><input id="cover" type="url"></div>
     <div class="grid">
-      <div class="field"><label for="date">읽은 날짜</label><input id="date" type="date"></div>
-      <div class="field"><label for="rating">별점</label><input id="rating" type="number" min="0" max="5" step="0.5"></div>
+      <div class="field">
+        <label for="date">읽은 날짜</label>
+        <input id="date" type="date">
+      </div>
+      <div class="field">
+        <label>별점</label>
+        <input id="rating" type="hidden" value="">
+        <div class="rating-picker" id="ratingPicker" aria-label="별점 선택">
+          <div class="star-wrap"><div class="star-bg">★</div><div class="star-fill">★</div><button type="button" class="half-left" data-rating="0.5" aria-label="0.5점"></button><button type="button" class="half-right" data-rating="1" aria-label="1점"></button></div>
+          <div class="star-wrap"><div class="star-bg">★</div><div class="star-fill">★</div><button type="button" class="half-left" data-rating="1.5" aria-label="1.5점"></button><button type="button" class="half-right" data-rating="2" aria-label="2점"></button></div>
+          <div class="star-wrap"><div class="star-bg">★</div><div class="star-fill">★</div><button type="button" class="half-left" data-rating="2.5" aria-label="2.5점"></button><button type="button" class="half-right" data-rating="3" aria-label="3점"></button></div>
+          <div class="star-wrap"><div class="star-bg">★</div><div class="star-fill">★</div><button type="button" class="half-left" data-rating="3.5" aria-label="3.5점"></button><button type="button" class="half-right" data-rating="4" aria-label="4점"></button></div>
+          <div class="star-wrap"><div class="star-bg">★</div><div class="star-fill">★</div><button type="button" class="half-left" data-rating="4.5" aria-label="4.5점"></button><button type="button" class="half-right" data-rating="5" aria-label="5점"></button></div>
+          <span class="rating-value" id="ratingValue">선택 안 함</span>
+        </div>
+      </div>
     </div>
     <div class="field"><label for="review">간단 독후감</label><textarea id="review" placeholder="한 줄이어도 좋아요."></textarea></div>
     <div class="actions">
@@ -204,21 +278,37 @@
   function esc(v=""){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
   function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
   function hash(str){let h=0;for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;return h}
+  function setRating(value){
+    const v=Math.max(0,Math.min(5,Number(value)||0));
+    $("rating").value=v ? String(v) : "";
+    const fills=document.querySelectorAll("#ratingPicker .star-fill");
+    fills.forEach((fill,i)=>{
+      const starStart=i;
+      const amount=Math.max(0,Math.min(1,v-starStart));
+      fill.style.width=(amount*100)+"%";
+    });
+    $("ratingValue").textContent=v ? v.toFixed(1)+"점" : "선택 안 함";
+  }
   function size(book){
     const p=Number(book.pages)||250;
-    return {height:clamp(34+(p/1000)*30,34,64),width:clamp(72+(hash(book.title)%18),72,90)}
+    return {height:clamp(38+(p/1000)*34,38,70),width:clamp(76+(hash(book.title)%17),76,93)}
   }
   function render(){
     const books=loadBooks(); $("count").textContent=books.length+"권"; $("stack").innerHTML="";
-    if(!books.length){$("stack").innerHTML='<div class="empty"><strong>아직 쌓인 책이 없어요.</strong>위에서 책을 검색하거나 직접 추가해보세요.</div>';return}
+    if(!books.length){$("stack").innerHTML='<div class="empty"><strong>아직 쌓인 책이 없어요.</strong>책을 추가하면 실제 책 커버 느낌으로 한 권씩 쌓여요.</div>';return}
     books.forEach(book=>{
       const s=size(book), b=document.createElement("button");
       b.className="book";
       b.style.height=s.height+"px"; b.style.width=s.width+"%";
-      b.style.background=book.color||COLORS[hash(book.title)%COLORS.length];
-      b.style.borderRadius=Math.max(5,s.height*.14)+"px";
-      b.style.transform=`translateX(${(hash(book.title+"x")%25)-12}px) rotate(${((hash(book.id)%9)-4)*.45}deg)`;
-      b.innerHTML='<span class="book-title">'+esc(book.title)+'</span>';
+      const fallback=book.color||COLORS[hash(book.title)%COLORS.length];
+      b.style.background=fallback;
+      if(book.cover){
+        const safeCover=String(book.cover).replace(/["\\]/g,"");
+        b.style.backgroundImage=`linear-gradient(rgba(0,0,0,.02),rgba(0,0,0,.02)),url("${safeCover}")`;
+      }
+      b.style.borderRadius=Math.max(6,s.height*.16)+"px";
+      b.style.transform=`translateX(${(hash(book.title+"x")%25)-12}px) rotate(${((hash(book.id)%9)-4)*.42}deg)`;
+      b.innerHTML='<span class="book-cover-veil"></span><span class="book-top-edge"></span><span class="book-title">'+esc(book.title)+'</span>';
       b.addEventListener("click",()=>openDetail(book.id));
       $("stack").appendChild(b);
     });
@@ -230,7 +320,7 @@
     $("bookId").value=book?.id||""; $("title").value=book?.title||""; $("author").value=book?.author||"";
     $("pages").value=book?.pages||""; $("cover").value=book?.cover||"";
     $("date").value=book?.date||new Date().toISOString().slice(0,10);
-    $("rating").value=book?.rating??""; $("review").value=book?.review||"";
+    setRating(book?.rating??""); $("review").value=book?.review||"";
   }
   function closeEditor(){$("editorBg").classList.remove("open");document.body.style.overflow=""}
   function saveEditor(){
@@ -324,6 +414,10 @@
   });
   $("editorBg").addEventListener("click",e=>{if(e.target===$("editorBg"))closeEditor()});
   $("detailBg").addEventListener("click",e=>{if(e.target===$("detailBg"))closeDetail()});
+  document.querySelectorAll("#ratingPicker button[data-rating]").forEach(btn=>{
+    btn.addEventListener("click",()=>setRating(btn.dataset.rating));
+  });
+  $("ratingPicker").addEventListener("dblclick",()=>setRating(0));
   $("searchBtn").addEventListener("click",searchBooks);
   $("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")searchBooks()});
 
@@ -343,7 +437,7 @@
   $("exportBtn").addEventListener("click",()=>{
     const payload={
       app:"나의 책더미",
-      version:"1.3",
+      version:"1.4",
       exportedAt:new Date().toISOString(),
       books:loadBooks()
     };

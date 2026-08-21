@@ -1,19 +1,20 @@
-나의 책더미 v1.3
+나의 책더미 v1.5
 
 변경 사항
-- Cloudflare Worker를 통해 알라딘 국내도서 검색
-- 앱 사용자는 API 키를 입력할 필요 없음
-- 각 사용자 독서 기록은 각 기기의 localStorage에 따로 저장
-- 설정 메뉴에는 백업/복원만 유지
+- 홈의 책을 더 실제 책처럼 보이도록 수정
+- 알라딘 표지 이미지를 책의 겉표지/책등 질감처럼 사용
+- 왼쪽에 종이 페이지 단면 표현
+- 상단 책 모서리와 그림자 추가
+- 쪽수에 따라 두께 변화 유지
+- 책마다 길이/기울기 차이 유지
+- v1.4의 별점 0.5점 터치 기능과 백업/복원 유지
+- Cloudflare Worker 검색 구조 유지
 
-연결된 Worker
-https://old-brook-92fd.leegh1310.workers.dev
-
-GitHub 저장소 최상위에 아래 파일을 업로드/교체하세요.
+GitHub 저장소 최상위에 아래 파일을 교체하세요.
 index.html
 manifest.json
 sw.js
 icon-192.png
 icon-512.png
 
-화면에 v1.3이 보이면 새 버전이 적용된 것입니다.
+worker-protected.js는 Cloudflare Worker를 다시 수정할 때만 사용하면 됩니다.
