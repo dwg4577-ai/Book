@@ -226,6 +226,41 @@
     .lib-tab{border:0;border-radius:999px;padding:7px 11px;background:#f3f5f6;color:#657078;font-size:11px;font-weight:800;cursor:pointer}
     .lib-tab.active{background:var(--accent-soft);color:#50778d}
 
+  
+    .search-overlay{
+      position:fixed;inset:0;z-index:35;display:none;
+      background:rgba(25,35,42,.16);
+      padding:calc(env(safe-area-inset-top) + 118px) 14px calc(env(safe-area-inset-bottom) + 86px);
+      align-items:stretch;justify-content:center;
+    }
+    .search-overlay.open{display:flex}
+    .search-panel{
+      width:100%;max-width:620px;min-height:0;background:#fff;border:1px solid #eceff1;border-radius:22px;
+      box-shadow:0 18px 50px rgba(30,55,70,.14);padding:14px;display:flex;flex-direction:column;
+    }
+    .search-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .search-panel-title{font-size:17px;font-weight:850}
+    .search-panel-sub{font-size:11px;color:var(--muted);margin-top:3px}
+    .search-panel .search-results{
+      display:block!important;max-height:none;min-height:0;flex:1 1 auto;margin:0;border:0;border-radius:14px;
+      overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#fff;
+    }
+    .search-panel .result{padding:16px 14px;gap:14px}
+    .search-panel .result img{width:58px}
+    .search-panel .result-note{display:flex;align-items:center;justify-content:center;min-height:180px;padding:24px;text-align:center}
+
+  
+    .search-wrap{flex:0 0 auto}
+    .search-close-btn{
+      border:0;background:#f3f5f6;color:#68757c;border-radius:13px;
+      width:42px;flex:0 0 42px;font-size:22px;line-height:1;cursor:pointer;
+    }
+    .search-reopen{
+      align-self:flex-start;border:0;background:var(--accent-soft);color:#52778d;
+      border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;
+      margin:0 0 8px;cursor:pointer;flex:0 0 auto;
+    }
+
   </style>
 </head>
 <body>
@@ -233,7 +268,7 @@
   <header>
     <div>
       <h1>책책책 <span class="title-emoji">📖</span></h1>
-      <div class="sub">오늘도 한 권, 차곡차곡. · v2.4</div>
+      <div class="sub">오늘도 한 권, 차곡차곡. · v2.6</div>
     </div>
     <div class="header-actions">
       <div class="count-wrap">
@@ -244,11 +279,26 @@
     </div>
   </header>
 
-  <div class="search-row">
-    <input id="bookSearch" placeholder="어떤 책을 읽었나요?" autocomplete="off" />
-    <button class="search-btn" id="searchBtn">검색</button>
+  <div class="search-wrap" id="searchWrap">
+    <div class="search-row">
+      <input id="bookSearch" placeholder="어떤 책을 읽었나요?" autocomplete="off" />
+      <button class="search-btn" id="searchBtn">검색</button>
+      <button class="search-close-btn" id="hideSearchBtn" type="button" aria-label="검색창 닫기">×</button>
+    </div>
   </div>
-  <div class="search-results" id="searchResults"></div>
+  <button class="search-reopen" id="showSearchBtn" type="button" hidden>🔎 책 찾기</button>
+  <div class="search-overlay" id="searchOverlay">
+      <section class="search-panel" role="dialog" aria-modal="true" aria-label="책 검색 결과">
+        <div class="search-panel-head">
+          <div>
+            <div class="search-panel-title">책 찾기</div>
+            <div class="search-panel-sub" id="searchPanelSub">알라딘에서 검색해요.</div>
+          </div>
+          <button class="detail-close static" id="closeSearch" type="button" aria-label="검색 닫기">×</button>
+        </div>
+        <div class="search-results open" id="searchResults"></div>
+      </section>
+    </div>
 
   <section class="monthly-panel">
     <button class="month-toggle" id="monthToggle" type="button" aria-expanded="false">
@@ -430,9 +480,15 @@
     const now=new Date();
     const currentKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
     const counts={};
+    const monthlySeen={};
     books.forEach(b=>{
       const k=monthKey(b.date);
-      if(k) counts[k]=(counts[k]||0)+1;
+      if(!k) return;
+      if(!monthlySeen[k]) monthlySeen[k]=new Set();
+      const ck=canonicalKey(b);
+      if(monthlySeen[k].has(ck)) return;
+      monthlySeen[k].add(ck);
+      counts[k]=(counts[k]||0)+1;
     });
     const currentCount=counts[currentKey]||0;
     $("monthCount").textContent=`이번 달 ${currentCount}권`;
@@ -597,7 +653,13 @@
     if(!prev.length){ openEditor(draft); return; }
     pendingRereadDraft=draft;
     pendingPrevious=prev.sort((a,b)=>(a.date||"").localeCompare(b.date||""));
-    $("rereadSub").textContent=`${draft.title} · 지금까지 ${prev.length}회 읽었어요.`;
+    const nextCount=prev.length+1;
+    let msg="또 읽으셨네요! 📖";
+    if(nextCount===2) msg="또 읽으셨네요! 📖";
+    else if(nextCount===3) msg="세 번째 읽으시는 책이네요! ✨";
+    else if(nextCount===4) msg="벌써 네 번째예요! 💛";
+    else if(nextCount>=5) msg=`이 책, 정말 좋아하시나 봐요! ${nextCount}번째예요 ☺️`;
+    $("rereadSub").textContent=`${msg} · ${draft.title}`;
     $("rereadPrev").innerHTML=pendingPrevious.map((r,i)=>`
       <div class="reread-prev-item">
         <div class="reread-prev-head">${i+1}회차 · ${esc(r.date||"날짜 없음")} ${r.rating?"· ★ "+esc(r.rating):""}</div>
@@ -657,7 +719,8 @@
   async function searchBooks(){
     const q=$("bookSearch").value.trim(); if(!q)return;
     const box=$("searchResults");
-    box.classList.add("open");
+    $("searchOverlay").classList.add("open");
+    $("searchPanelSub").textContent=`"${q}" 검색 중`;
     box.innerHTML='<div class="result-note">📖 알라딘에서 책을 찾고 있어요…</div>';
 
     try{
@@ -670,10 +733,12 @@
 
       const items=data.books||[];
       if(!items.length){
+        $("searchPanelSub").textContent=`"${q}" 검색 결과`;
         box.innerHTML='<div class="result-note">검색 결과가 없어요.</div>';
         return;
       }
 
+      $("searchPanelSub").textContent=`"${q}" 검색 결과 ${items.length}개`;
       box.innerHTML="";
       items.forEach(item=>{
         const img=(item.cover||"").replace(/^http:/,"https:");
@@ -684,7 +749,6 @@
           <div><div class="rtitle">${esc(item.title||"제목 없음")}</div>
           <div class="rmeta">${esc(item.author||"")}${pageCount?" · "+pageCount+"쪽":""}${item.publisher?"<br>"+esc(item.publisher):""}</div></div>`;
         btn.addEventListener("click",async()=>{
-          box.classList.remove("open");
           let pages=pageCount||0;
           let detail=item;
           if(item.isbn13){
@@ -707,6 +771,7 @@
             isbn13:detail.isbn13||item.isbn13||"",
             aladinLink:detail.link||item.link||""
           };
+          $("searchOverlay").classList.remove("open");
           handleBookSelection(draft);
         });
         box.appendChild(btn);
@@ -766,6 +831,18 @@
       renderLibraryList();
     });
   });
+  $("hideSearchBtn").addEventListener("click",()=>{
+    $("searchWrap").hidden=true;
+    $("showSearchBtn").hidden=false;
+    $("searchOverlay").classList.remove("open");
+  });
+  $("showSearchBtn").addEventListener("click",()=>{
+    $("searchWrap").hidden=false;
+    $("showSearchBtn").hidden=true;
+    requestAnimationFrame(()=>$("bookSearch").focus());
+  });
+  $("closeSearch").addEventListener("click",()=>{$("searchOverlay").classList.remove("open")});
+  $("searchOverlay").addEventListener("click",e=>{if(e.target===$("searchOverlay"))$("searchOverlay").classList.remove("open")});
   $("searchBtn").addEventListener("click",searchBooks);
   $("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")searchBooks()});
 
@@ -785,7 +862,7 @@
   $("exportBtn").addEventListener("click",()=>{
     const payload={
       app:"책책책",
-      version:"2.4",
+      version:"2.6",
       exportedAt:new Date().toISOString(),
       books:loadBooks()
     };
@@ -826,13 +903,16 @@
     e.target.value="";
   });
 
+  window.addEventListener("pageshow",()=>positionLatestBook());
+  window.addEventListener("resize",()=>positionLatestBook());
+
   render();
 })();
 </script>
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
-    navigator.serviceWorker.register("./sw.js?v=2.4").then(function(r){r.update();}).catch(function(){});
+    navigator.serviceWorker.register("./sw.js?v=2.6").then(function(r){r.update();}).catch(function(){});
   });
 }
 </script>
