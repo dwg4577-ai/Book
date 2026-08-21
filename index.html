@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f1e7" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="나의 책더미" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>나의 책더미</title>
+  <style>
+    :root{
+      --bg:#f6f1e7;
+      --ink:#28251f;
+      --muted:#7b7468;
+      --card:#fffdf8;
+      --line:#ded6c8;
+      --shadow:0 10px 30px rgba(72,58,38,.12);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+    body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+    button,input,textarea{font:inherit}
+    button{-webkit-tap-highlight-color:transparent}
+    .app{width:min(680px,100%);margin:0 auto;min-height:100vh;padding:20px 18px 120px}
+    header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+    h1{font-size:27px;line-height:1.15;margin:0;font-weight:800;letter-spacing:-.03em}
+    .sub{margin-top:7px;font-size:13px;color:var(--muted)}
+    .count{font-size:13px;color:var(--muted);white-space:nowrap}
+    .search-row{display:flex;gap:8px;margin-bottom:16px}
+    .search-row input{flex:1}
+    input,textarea{
+      width:100%;border:1px solid var(--line);background:white;border-radius:13px;
+      padding:12px 13px;color:var(--ink);outline:none;font-size:16px;
+    }
+    textarea{resize:vertical;min-height:110px;line-height:1.55}
+    input:focus,textarea:focus{border-color:#a99d8c}
+    .search-btn,.mini-btn{
+      border:0;border-radius:13px;background:#292620;color:white;font-weight:800;padding:0 14px;cursor:pointer
+    }
+    .search-results{display:none;background:#fffdf8;border:1px solid var(--line);border-radius:16px;margin:-4px 0 18px;overflow:hidden}
+    .search-results.open{display:block}
+    .result{
+      display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border:0;background:white;
+      padding:12px;border-bottom:1px solid #eee8dd;cursor:pointer;color:inherit
+    }
+    .result:last-child{border-bottom:0}
+    .result img{width:46px;aspect-ratio:2/3;object-fit:cover;border-radius:6px;background:#eee}
+    .rtitle{font-weight:800;font-size:14px;line-height:1.35}
+    .rmeta{font-size:12px;color:var(--muted);line-height:1.45;margin-top:4px}
+    .result-note{padding:12px;font-size:13px;color:var(--muted)}
+    .stack-wrap{min-height:510px;display:flex;align-items:flex-end;justify-content:center;padding:12px 4px 22px}
+    .stack{width:100%;display:flex;flex-direction:column-reverse;align-items:center;gap:8px}
+    .book{
+      border:0;position:relative;display:flex;align-items:center;justify-content:center;padding:0 18px;
+      box-shadow:0 5px 8px rgba(60,46,26,.12);color:#fff;font-weight:750;letter-spacing:-.02em;
+      cursor:pointer;overflow:hidden
+    }
+    .book::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.2),transparent 18%,transparent 78%,rgba(0,0,0,.08));pointer-events:none}
+    .book-title{z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:88%;font-size:14px;text-shadow:0 1px 2px rgba(0,0,0,.16)}
+    .empty{margin:auto;text-align:center;color:var(--muted);padding:70px 20px}
+    .empty strong{display:block;color:var(--ink);font-size:18px;margin-bottom:8px}
+    .fab{
+      position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom));
+      border:0;border-radius:999px;padding:15px 22px;background:#292620;color:white;font-weight:800;
+      box-shadow:0 10px 24px rgba(0,0,0,.22);cursor:pointer;z-index:20
+    }
+    .sheet-bg{position:fixed;inset:0;background:rgba(22,18,13,.28);display:none;align-items:flex-end;justify-content:center;z-index:30}
+    .sheet-bg.open{display:flex}
+    .sheet{
+      width:min(680px,100%);max-height:92vh;overflow:auto;background:var(--card);border-radius:24px 24px 0 0;
+      padding:18px 18px calc(28px + env(safe-area-inset-bottom));box-shadow:var(--shadow)
+    }
+    .handle{width:46px;height:5px;background:#d5cec1;border-radius:9px;margin:0 auto 18px}
+    .sheet h2{font-size:20px;margin:0 0 18px}
+    .field{margin-bottom:14px}
+    label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .actions{display:flex;gap:10px;margin-top:18px}
+    .btn{flex:1;border:0;border-radius:13px;padding:13px 12px;font-weight:800;cursor:pointer}
+    .btn.primary{background:#292620;color:#fff}
+    .btn.secondary{background:#eee8dd;color:#4f493f}
+    .btn.danger{background:#f5e4e0;color:#9a3d2d}
+    .hint{font-size:12px;color:var(--muted);margin:-4px 0 12px;line-height:1.45}
+    .detail-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:18px}
+    .cover{width:76px;aspect-ratio:2/3;background:#eee6d8;border-radius:9px;object-fit:cover;box-shadow:0 6px 14px rgba(0,0,0,.14)}
+    .detail-meta{flex:1}
+    .detail-title{font-size:21px;font-weight:850;line-height:1.35;margin-bottom:7px}
+    .meta{font-size:13px;color:var(--muted);line-height:1.6}
+    .review-box{white-space:pre-wrap;line-height:1.7;background:#f8f4ec;border-radius:14px;padding:14px;margin-top:10px}
+    .stars{letter-spacing:2px;color:#aa7d20}
+    @media(max-width:420px){
+      .app{padding-left:14px;padding-right:14px}
+      .stack-wrap{min-height:480px}
+      .book-title{font-size:13px}
+    }
+  </style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div>
+      <h1>나의 책더미</h1>
+      <div class="sub">읽은 만큼 한 권씩 쌓여요.</div>
+    </div>
+    <div class="count" id="count">0권</div>
+  </header>
+
+  <div class="search-row">
+    <input id="bookSearch" placeholder="책 제목 검색" autocomplete="off" />
+    <button class="search-btn" id="searchBtn">검색</button>
+  </div>
+  <div class="search-results" id="searchResults"></div>
+
+  <section class="stack-wrap">
+    <div class="stack" id="stack"></div>
+  </section>
+</main>
+
+<button class="fab" id="addBtn">＋ 직접 추가</button>
+
+<div class="sheet-bg" id="editorBg">
+  <section class="sheet" role="dialog" aria-modal="true">
+    <div class="handle"></div>
+    <h2 id="editorTitle">책 추가</h2>
+    <input type="hidden" id="bookId">
+    <div class="field"><label for="title">책 제목</label><input id="title"></div>
+    <div class="grid">
+      <div class="field"><label for="author">저자</label><input id="author"></div>
+      <div class="field"><label for="pages">쪽수</label><input id="pages" type="number" min="1" inputmode="numeric"></div>
+    </div>
+    <div class="field"><label for="cover">표지 이미지 주소</label><input id="cover" type="url"></div>
+    <div class="grid">
+      <div class="field"><label for="date">읽은 날짜</label><input id="date" type="date"></div>
+      <div class="field"><label for="rating">별점</label><input id="rating" type="number" min="0" max="5" step="0.5"></div>
+    </div>
+    <div class="field"><label for="review">간단 독후감</label><textarea id="review" placeholder="한 줄이어도 좋아요."></textarea></div>
+    <div class="actions">
+      <button class="btn secondary" id="cancelBtn">취소</button>
+      <button class="btn primary" id="saveBtn">저장</button>
+    </div>
+  </section>
+</div>
+
+<div class="sheet-bg" id="detailBg">
+  <section class="sheet" role="dialog" aria-modal="true">
+    <div class="handle"></div>
+    <div id="detailContent"></div>
+    <div class="actions">
+      <button class="btn secondary" id="closeDetail">닫기</button>
+      <button class="btn primary" id="editDetail">수정</button>
+    </div>
+    <div class="actions"><button class="btn danger" id="deleteDetail">이 책 삭제</button></div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY="myBookStack.v2";
+  const COLORS=["#8b6953","#586f72","#7a687f","#9b6b62","#747b57","#4f687b","#8d7756","#765d5d","#62735f","#665c78"];
+  const $=id=>document.getElementById(id);
+  let activeDetailId=null;
+
+  function loadBooks(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]}catch(e){return[]}}
+  function saveBooks(v){localStorage.setItem(STORAGE_KEY,JSON.stringify(v))}
+  function esc(v=""){return String(v).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+  function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
+  function hash(str){let h=0;for(let i=0;i<str.length;i++)h=(h*31+str.charCodeAt(i))>>>0;return h}
+  function size(book){
+    const p=Number(book.pages)||250;
+    return {height:clamp(34+(p/1000)*30,34,64),width:clamp(72+(hash(book.title)%18),72,90)}
+  }
+  function render(){
+    const books=loadBooks(); $("count").textContent=books.length+"권"; $("stack").innerHTML="";
+    if(!books.length){$("stack").innerHTML='<div class="empty"><strong>아직 쌓인 책이 없어요.</strong>위에서 책을 검색하거나 직접 추가해보세요.</div>';return}
+    books.forEach(book=>{
+      const s=size(book), b=document.createElement("button");
+      b.className="book";
+      b.style.height=s.height+"px"; b.style.width=s.width+"%";
+      b.style.background=book.color||COLORS[hash(book.title)%COLORS.length];
+      b.style.borderRadius=Math.max(5,s.height*.14)+"px";
+      b.style.transform=`translateX(${(hash(book.title+"x")%25)-12}px) rotate(${((hash(book.id)%9)-4)*.45}deg)`;
+      b.innerHTML='<span class="book-title">'+esc(book.title)+'</span>';
+      b.addEventListener("click",()=>openDetail(book.id));
+      $("stack").appendChild(b);
+    });
+  }
+
+  function openEditor(book){
+    document.body.style.overflow="hidden"; $("editorBg").classList.add("open");
+    $("editorTitle").textContent=book?"책 기록 수정":"책 추가";
+    $("bookId").value=book?.id||""; $("title").value=book?.title||""; $("author").value=book?.author||"";
+    $("pages").value=book?.pages||""; $("cover").value=book?.cover||"";
+    $("date").value=book?.date||new Date().toISOString().slice(0,10);
+    $("rating").value=book?.rating??""; $("review").value=book?.review||"";
+  }
+  function closeEditor(){$("editorBg").classList.remove("open");document.body.style.overflow=""}
+  function saveEditor(){
+    const title=$("title").value.trim(); if(!title){alert("책 제목을 입력해주세요.");return}
+    const id=$("bookId").value; let books=loadBooks();
+    const old=books.find(b=>b.id===id)||{};
+    const data={
+      id:id||("b"+Date.now()+Math.random().toString(16).slice(2)),
+      title,author:$("author").value.trim(),pages:Number($("pages").value)||0,
+      cover:$("cover").value.trim(),date:$("date").value,rating:$("rating").value,
+      review:$("review").value.trim(),createdAt:old.createdAt||Date.now()
+    };
+    books=id?books.map(b=>b.id===id?{...b,...data}:b):[...books,data];
+    saveBooks(books);closeEditor();render();
+  }
+
+  function openDetail(id){
+    const book=loadBooks().find(b=>b.id===id); if(!book)return; activeDetailId=id;
+    document.body.style.overflow="hidden"; $("detailBg").classList.add("open");
+    $("detailContent").innerHTML=`
+      <div class="detail-head">
+        ${book.cover?`<img class="cover" src="${esc(book.cover)}" alt="">`:'<div class="cover"></div>'}
+        <div class="detail-meta"><div class="detail-title">${esc(book.title)}</div>
+        <div class="meta">${book.author?esc(book.author)+"<br>":""}${book.pages?book.pages.toLocaleString()+"쪽<br>":""}${book.date?esc(book.date)+"<br>":""}
+        <span class="stars">${book.rating?"★ "+esc(book.rating)+" / 5":"별점 없음"}</span></div></div>
+      </div>
+      <label>독후감</label><div class="review-box">${esc(book.review||"아직 작성한 독후감이 없어요.")}</div>`;
+  }
+  function closeDetail(){$("detailBg").classList.remove("open");document.body.style.overflow="";activeDetailId=null}
+
+  async function searchBooks(){
+    const q=$("bookSearch").value.trim(); if(!q)return;
+    const box=$("searchResults"); box.classList.add("open"); box.innerHTML='<div class="result-note">검색 중...</div>';
+    try{
+      const res=await fetch("https://www.googleapis.com/books/v1/volumes?q="+encodeURIComponent(q)+"&maxResults=8&printType=books");
+      if(!res.ok) throw new Error();
+      const data=await res.json(); const items=data.items||[];
+      if(!items.length){box.innerHTML='<div class="result-note">검색 결과가 없어요.</div>';return}
+      box.innerHTML="";
+      items.forEach(item=>{
+        const v=item.volumeInfo||{}, img=(v.imageLinks?.thumbnail||v.imageLinks?.smallThumbnail||"").replace(/^http:/,"https:");
+        const btn=document.createElement("button"); btn.className="result";
+        btn.innerHTML=`${img?`<img src="${esc(img)}" alt="">`:'<div style="width:46px;aspect-ratio:2/3;background:#eee;border-radius:6px"></div>'}
+          <div><div class="rtitle">${esc(v.title||"제목 없음")}</div>
+          <div class="rmeta">${esc((v.authors||[]).join(", "))}${v.pageCount?" · "+v.pageCount+"쪽":""}${v.publisher?"<br>"+esc(v.publisher):""}</div></div>`;
+        btn.addEventListener("click",()=>{
+          box.classList.remove("open");
+          openEditor({title:v.title||"",author:(v.authors||[]).join(", "),pages:v.pageCount||0,cover:img,date:new Date().toISOString().slice(0,10),rating:"",review:""});
+        });
+        box.appendChild(btn);
+      });
+    }catch(e){
+      box.innerHTML='<div class="result-note">검색에 실패했어요. 직접 추가를 이용해주세요.</div>';
+    }
+  }
+
+  $("addBtn").addEventListener("click",()=>openEditor());
+  $("cancelBtn").addEventListener("click",closeEditor);
+  $("saveBtn").addEventListener("click",saveEditor);
+  $("closeDetail").addEventListener("click",closeDetail);
+  $("editDetail").addEventListener("click",()=>{
+    const book=loadBooks().find(b=>b.id===activeDetailId); if(!book)return; closeDetail();openEditor(book)
+  });
+  $("deleteDetail").addEventListener("click",()=>{
+    if(!activeDetailId||!confirm("이 책 기록을 삭제할까요?"))return;
+    saveBooks(loadBooks().filter(b=>b.id!==activeDetailId));closeDetail();render()
+  });
+  $("editorBg").addEventListener("click",e=>{if(e.target===$("editorBg"))closeEditor()});
+  $("detailBg").addEventListener("click",e=>{if(e.target===$("detailBg"))closeDetail()});
+  $("searchBtn").addEventListener("click",searchBooks);
+  $("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")searchBooks()});
+  render();
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker.register("./sw.js").catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
