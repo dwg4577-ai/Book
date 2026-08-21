@@ -91,6 +91,17 @@
     .meta{font-size:13px;color:var(--muted);line-height:1.6}
     .review-box{white-space:pre-wrap;line-height:1.7;background:#f8f4ec;border-radius:14px;padding:14px;margin-top:10px}
     .stars{letter-spacing:2px;color:#aa7d20}
+    
+    .gear-btn{border:0;background:#ebe4d8;color:#4e473d;width:36px;height:36px;border-radius:50%;font-size:19px;cursor:pointer}
+    .section-card{background:#f8f4ec;border-radius:16px;padding:14px;margin-bottom:14px}
+    .section-title{font-weight:850;font-size:15px;margin-bottom:8px}
+    .section-text{font-size:12px;color:var(--muted);line-height:1.6}
+    .settings-row{display:flex;gap:8px;align-items:center}
+    .settings-row input{flex:1}
+    .tiny{font-size:11px;color:var(--muted);line-height:1.5}
+    .link-btn{display:inline-block;margin-top:8px;color:#5e5548;text-decoration:underline;font-size:12px}
+    .status{font-size:12px;margin-top:8px;color:var(--muted)}
+    .file-input{display:none}
     @media(max-width:420px){
       .app{padding-left:14px;padding-right:14px}
       .stack-wrap{min-height:480px}
@@ -103,9 +114,9 @@
   <header>
     <div>
       <h1>나의 책더미</h1>
-      <div class="sub">읽은 만큼 한 권씩 쌓여요.</div>
+      <div class="sub">읽은 만큼 한 권씩 쌓여요. · v1.2</div>
     </div>
-    <div class="count" id="count">0권</div>
+    <div style="display:flex;align-items:center;gap:8px"><div class="count" id="count">0권</div><button class="gear-btn" id="settingsBtn" aria-label="설정">⚙︎</button></div>
   </header>
 
   <div class="search-row">
@@ -156,9 +167,65 @@
   </section>
 </div>
 
+
+<div class="sheet-bg" id="settingsBg">
+  <section class="sheet" role="dialog" aria-modal="true">
+    <div class="handle"></div>
+    <h2>설정</h2>
+
+    <div class="section-card">
+      <div class="section-title">알라딘 API 키</div>
+      <div class="section-text">
+        API 키는 이 기기의 브라우저에만 저장하고, 웹앱 파일에는 넣지 않아요.
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label for="apiKey">TTBKey</label>
+        <input id="apiKey" type="password" placeholder="발급받은 TTBKey 입력" autocomplete="off">
+      </div>
+      <div class="actions">
+        <button class="btn secondary" id="clearApiBtn">키 삭제</button>
+        <button class="btn primary" id="saveApiBtn">키 저장</button>
+      </div>
+      <div class="status" id="apiStatus"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">API 키 발급 방법</div>
+      <div class="section-text">
+        1. 알라딘에 로그인해요.<br>
+        2. OpenAPI 키 발급 페이지에서 이 웹앱의 GitHub Pages 주소를 등록해요.<br>
+        3. 발급된 TTBKey를 복사해 위 입력칸에 붙여넣고 저장해요.<br><br>
+        예: https://사용자명.github.io/저장소이름/
+      </div>
+      <a class="link-btn" href="https://www.aladin.co.kr/ttb/wblog_manage.aspx" target="_blank" rel="noopener">알라딘 API 키 발급 페이지 열기</a>
+      <div class="tiny" style="margin-top:10px">
+        알라딘 기본 OpenAPI는 개인의 비영리 목적 사용이 가능하며, 등록한 URL 기준으로 키를 발급받는 방식이에요.
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">백업 / 복원</div>
+      <div class="section-text">
+        책 기록을 JSON 파일로 백업하고 다시 불러올 수 있어요. API 키는 보안을 위해 백업 파일에 포함하지 않아요.
+      </div>
+      <div class="actions">
+        <button class="btn secondary" id="importBtn">백업 불러오기</button>
+        <button class="btn primary" id="exportBtn">백업 저장</button>
+      </div>
+      <input class="file-input" id="importFile" type="file" accept=".json,application/json">
+      <div class="status" id="backupStatus"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" id="closeSettings">닫기</button>
+    </div>
+  </section>
+</div>
+
 <script>
 (function(){
   const STORAGE_KEY="myBookStack.v2";
+  const API_KEY_STORAGE="myBookStack.aladinTTBKey";
   const COLORS=["#8b6953","#586f72","#7a687f","#9b6b62","#747b57","#4f687b","#8d7756","#765d5d","#62735f","#665c78"];
   const $=id=>document.getElementById(id);
   let activeDetailId=null;
@@ -205,7 +272,7 @@
       id:id||("b"+Date.now()+Math.random().toString(16).slice(2)),
       title,author:$("author").value.trim(),pages:Number($("pages").value)||0,
       cover:$("cover").value.trim(),date:$("date").value,rating:$("rating").value,
-      review:$("review").value.trim(),createdAt:old.createdAt||Date.now()
+      review:$("review").value.trim(),isbn13:old.isbn13||"",aladinLink:old.aladinLink||"",createdAt:old.createdAt||Date.now()
     };
     books=id?books.map(b=>b.id===id?{...b,...data}:b):[...books,data];
     saveBooks(books);closeEditor();render();
@@ -227,28 +294,90 @@
 
   async function searchBooks(){
     const q=$("bookSearch").value.trim(); if(!q)return;
-    const box=$("searchResults"); box.classList.add("open"); box.innerHTML='<div class="result-note">검색 중...</div>';
+    const key=localStorage.getItem(API_KEY_STORAGE)||"";
+    const box=$("searchResults");
+    box.classList.add("open");
+
+    if(!key){
+      box.innerHTML='<div class="result-note">먼저 ⚙︎ 설정에서 알라딘 API 키를 저장해주세요.</div>';
+      return;
+    }
+
+    box.innerHTML='<div class="result-note">알라딘에서 검색 중...</div>';
+
+    const params=new URLSearchParams({
+      ttbkey:key,
+      Query:q,
+      QueryType:"Keyword",
+      MaxResults:"10",
+      start:"1",
+      SearchTarget:"Book",
+      output:"js",
+      Version:"20131101",
+      Cover:"Big"
+    });
+
     try{
-      const res=await fetch("https://www.googleapis.com/books/v1/volumes?q="+encodeURIComponent(q)+"&maxResults=8&printType=books");
-      if(!res.ok) throw new Error();
-      const data=await res.json(); const items=data.items||[];
-      if(!items.length){box.innerHTML='<div class="result-note">검색 결과가 없어요.</div>';return}
+      const res=await fetch("https://www.aladin.co.kr/ttb/api/ItemSearch.aspx?"+params.toString());
+      if(!res.ok) throw new Error("HTTP "+res.status);
+      const data=await res.json();
+      const items=data.item||[];
+
+      if(!items.length){
+        box.innerHTML='<div class="result-note">검색 결과가 없어요.</div>';
+        return;
+      }
+
       box.innerHTML="";
       items.forEach(item=>{
-        const v=item.volumeInfo||{}, img=(v.imageLinks?.thumbnail||v.imageLinks?.smallThumbnail||"").replace(/^http:/,"https:");
-        const btn=document.createElement("button"); btn.className="result";
+        const img=(item.cover||"").replace(/^http:/,"https:");
+        const pageCount=Number(item.subInfo?.itemPage||item.itemPage||0);
+        const btn=document.createElement("button");
+        btn.className="result";
         btn.innerHTML=`${img?`<img src="${esc(img)}" alt="">`:'<div style="width:46px;aspect-ratio:2/3;background:#eee;border-radius:6px"></div>'}
-          <div><div class="rtitle">${esc(v.title||"제목 없음")}</div>
-          <div class="rmeta">${esc((v.authors||[]).join(", "))}${v.pageCount?" · "+v.pageCount+"쪽":""}${v.publisher?"<br>"+esc(v.publisher):""}</div></div>`;
-        btn.addEventListener("click",()=>{
+          <div><div class="rtitle">${esc(item.title||"제목 없음")}</div>
+          <div class="rmeta">${esc(item.author||"")}${pageCount?" · "+pageCount+"쪽":""}${item.publisher?"<br>"+esc(item.publisher):""}</div></div>`;
+        btn.addEventListener("click",async()=>{
           box.classList.remove("open");
-          openEditor({title:v.title||"",author:(v.authors||[]).join(", "),pages:v.pageCount||0,cover:img,date:new Date().toISOString().slice(0,10),rating:"",review:""});
+          let pages=pageCount;
+          if(!pages && item.isbn13){
+            pages=await lookupPageCount(item.isbn13,key);
+          }
+          openEditor({
+            title:item.title||"",
+            author:item.author||"",
+            pages:pages||0,
+            cover:img,
+            date:new Date().toISOString().slice(0,10),
+            rating:"",
+            review:"",
+            isbn13:item.isbn13||"",
+            aladinLink:item.link||""
+          });
         });
         box.appendChild(btn);
       });
     }catch(e){
-      box.innerHTML='<div class="result-note">검색에 실패했어요. 직접 추가를 이용해주세요.</div>';
+      box.innerHTML='<div class="result-note">알라딘 검색 연결에 실패했어요. API 키와 등록한 웹앱 주소를 확인해주세요. 계속 안 되면 직접 추가를 사용할 수 있어요.</div>';
     }
+  }
+
+  async function lookupPageCount(isbn,key){
+    try{
+      const params=new URLSearchParams({
+        ttbkey:key,
+        itemIdType:"ISBN13",
+        ItemId:isbn,
+        output:"js",
+        Version:"20131101",
+        Cover:"Big"
+      });
+      const res=await fetch("https://www.aladin.co.kr/ttb/api/ItemLookUp.aspx?"+params.toString());
+      if(!res.ok)return 0;
+      const data=await res.json();
+      const item=(data.item||[])[0]||{};
+      return Number(item.subInfo?.itemPage||item.itemPage||0);
+    }catch(e){return 0}
   }
 
   $("addBtn").addEventListener("click",()=>openEditor());
@@ -266,6 +395,80 @@
   $("detailBg").addEventListener("click",e=>{if(e.target===$("detailBg"))closeDetail()});
   $("searchBtn").addEventListener("click",searchBooks);
   $("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")searchBooks()});
+
+  function openSettings(){
+    document.body.style.overflow="hidden";
+    $("settingsBg").classList.add("open");
+    const key=localStorage.getItem(API_KEY_STORAGE)||"";
+    $("apiKey").value=key;
+    $("apiStatus").textContent=key?"API 키가 저장되어 있어요.":"저장된 API 키가 없어요.";
+  }
+  function closeSettings(){
+    $("settingsBg").classList.remove("open");
+    document.body.style.overflow="";
+  }
+
+  $("settingsBtn").addEventListener("click",openSettings);
+  $("closeSettings").addEventListener("click",closeSettings);
+  $("settingsBg").addEventListener("click",e=>{if(e.target===$("settingsBg"))closeSettings()});
+
+  $("saveApiBtn").addEventListener("click",()=>{
+    const key=$("apiKey").value.trim();
+    if(!key){$("apiStatus").textContent="API 키를 입력해주세요.";return}
+    localStorage.setItem(API_KEY_STORAGE,key);
+    $("apiStatus").textContent="API 키를 이 기기에 저장했어요.";
+  });
+
+  $("clearApiBtn").addEventListener("click",()=>{
+    localStorage.removeItem(API_KEY_STORAGE);
+    $("apiKey").value="";
+    $("apiStatus").textContent="저장된 API 키를 삭제했어요.";
+  });
+
+  $("exportBtn").addEventListener("click",()=>{
+    const payload={
+      app:"나의 책더미",
+      version:"1.2",
+      exportedAt:new Date().toISOString(),
+      books:loadBooks()
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    const d=new Date();
+    const stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    a.href=url;
+    a.download=`나의책더미_백업_${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    $("backupStatus").textContent="백업 파일을 저장했어요.";
+  });
+
+  $("importBtn").addEventListener("click",()=>$("importFile").click());
+
+  $("importFile").addEventListener("change",async(e)=>{
+    const file=e.target.files?.[0];
+    if(!file)return;
+    try{
+      const text=await file.text();
+      const data=JSON.parse(text);
+      const books=Array.isArray(data)?data:data.books;
+      if(!Array.isArray(books))throw new Error("형식 오류");
+      if(!confirm(`백업에서 ${books.length}권을 불러올까요? 현재 기록은 백업 내용으로 교체돼요.`)){
+        e.target.value="";
+        return;
+      }
+      saveBooks(books);
+      render();
+      $("backupStatus").textContent=`${books.length}권을 복원했어요.`;
+    }catch(err){
+      $("backupStatus").textContent="백업 파일을 읽지 못했어요. 올바른 JSON 백업 파일인지 확인해주세요.";
+    }
+    e.target.value="";
+  });
+
   render();
 })();
 </script>

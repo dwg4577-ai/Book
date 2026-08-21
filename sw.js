@@ -1,4 +1,4 @@
-const CACHE = "book-stack-v1";
+const CACHE = "book-stack-v1-2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -22,7 +22,9 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
+
   event.respondWith(
     fetch(event.request)
       .then(response => {
